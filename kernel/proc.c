@@ -345,11 +345,16 @@ reparent(struct proc *p)
 // until its parent calls wait().
 void
 exit(int status)
+// TASK 3
+//exit(int status, char* msg)
 {
   struct proc *p = myproc();
 
   if(p == initproc)
     panic("init exiting");
+
+  // TASK 3
+  //argstr(1 ,p->exit_msg , strlen(msg));
 
   // Close all open files.
   for(int fd = 0; fd < NOFILE; fd++){
@@ -389,6 +394,8 @@ exit(int status)
 // Return -1 if this process has no children.
 int
 wait(uint64 addr)
+//TASK 3
+//wait(uint64 addr, uint64 msg_address)
 {
   struct proc *pp;
   int havekids, pid;
@@ -409,11 +416,22 @@ wait(uint64 addr)
           // Found one.
           pid = pp->pid;
           if(addr != 0 && copyout(p->pagetable, addr, (char *)&pp->xstate,
-                                  sizeof(pp->xstate)) < 0) {
+                                  sizeof(pp->xstate)) < 0)
+                                 {
             release(&pp->lock);
             release(&wait_lock);
             return -1;
           }
+
+          // TASK 3
+          // if(msg_address != 0 && copyout(p->pagetable, msg_address, (char *)&pp->exit_msg,
+          //       sizeof(pp->exit_msg)) < 0)
+          //           {
+          //   release(&pp->lock);
+          //   release(&wait_lock);
+          //   return -1;
+          //   }
+
           freeproc(pp);
           release(&pp->lock);
           release(&wait_lock);

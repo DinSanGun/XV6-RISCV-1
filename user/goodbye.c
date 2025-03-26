@@ -3,10 +3,7 @@
 #include "user/user.h"
 
 int main() {
-
-    char *str = "Hello World xv6\n";
-    //write(1, str, strlen(str));
-    printf(str);
-
+    //char *msg = "Goodbye World xv6\n";
+    //exit(0, msg);
     exit(0);
 }

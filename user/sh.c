@@ -167,7 +167,12 @@ main(void)
     }
     if(fork1() == 0)
       runcmd(parsecmd(buf));
-    wait(0);
+
+    // TASK 3
+    // char* exit_msg;
+    // wait(0, exit_msg);
+    // printf(exit_msg);
+
   }
   exit(0);
 }
