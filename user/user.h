@@ -2,9 +2,9 @@ struct stat;
 
 // system calls
 int fork(void);
-int exit(int) __attribute__((noreturn));
+//int exit(int) __attribute__((noreturn));
 // TASK 3
-//int exit(int, char*) __attribute__((noreturn));
+int exit(int, char*) __attribute__((noreturn));
 int wait(int*);
 // TASK 3
 //int wait(int*, char*);

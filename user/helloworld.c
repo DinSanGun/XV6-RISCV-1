@@ -8,5 +8,5 @@ int main() {
     //write(1, str, strlen(str));
     printf(str);
 
-    exit(0);
+    exit(0, "");
 }

@@ -15,5 +15,5 @@ int main() {
 
     printf("The memory size after memory allocation freed is %d\n", memsize());
     
-    exit(0);
+    exit(0, "");
 }

@@ -344,9 +344,9 @@ reparent(struct proc *p)
 // An exited process remains in the zombie state
 // until its parent calls wait().
 void
-exit(int status)
+//exit(int status)
 // TASK 3
-//exit(int status, char* msg)
+exit(int status, char* msg)
 {
   struct proc *p = myproc();
 
@@ -354,7 +354,7 @@ exit(int status)
     panic("init exiting");
 
   // TASK 3
-  //argstr(1 ,p->exit_msg , strlen(msg));
+  argstr(1 ,p->exit_msg , strlen(msg));
 
   // Close all open files.
   for(int fd = 0; fd < NOFILE; fd++){
