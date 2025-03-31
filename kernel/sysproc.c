@@ -17,7 +17,10 @@ sys_exit(void)
 {
   int n;
   argint(0, &n);
-  exit(n);
+  //TASK 3
+  char* msg;
+  argstr(1, &msg, strlen(msg));
+  exit(n, "");
   return 0;  // not reached
 }
 
