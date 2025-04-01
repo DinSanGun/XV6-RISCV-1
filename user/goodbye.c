@@ -3,7 +3,5 @@
 #include "user/user.h"
 
 int main() {
-    //char *msg = "Goodbye World xv6\n";
-    //exit(0, msg);
-    exit(0, "Goodbye World xv6");
+    exit(0, "Goodbye World xv6\n");
 }

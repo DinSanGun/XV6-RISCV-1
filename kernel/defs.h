@@ -102,7 +102,7 @@ void            scheduler(void) __attribute__((noreturn));
 void            sched(void);
 void            sleep(void*, struct spinlock*);
 void            userinit(void);
-int             wait(uint64);
+int             wait(uint64, char*);
 // TASK 3
 //int             wait(uint64, char*);
 void            wakeup(void*);

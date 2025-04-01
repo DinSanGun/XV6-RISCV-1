@@ -64,6 +64,7 @@ runcmd(struct cmd *cmd)
   struct listcmd *lcmd;
   struct pipecmd *pcmd;
   struct redircmd *rcmd;
+  char exit_msg[32];
 
   if(cmd == 0)
     exit(1, "");
@@ -94,7 +95,8 @@ runcmd(struct cmd *cmd)
     lcmd = (struct listcmd*)cmd;
     if(fork1() == 0)
       runcmd(lcmd->left);
-    wait(0);
+    wait(0, exit_msg);
+    printf(exit_msg);
     runcmd(lcmd->right);
     break;
 
@@ -118,8 +120,10 @@ runcmd(struct cmd *cmd)
     }
     close(p[0]);
     close(p[1]);
-    wait(0);
-    wait(0);
+    wait(0, exit_msg);
+    printf(exit_msg);
+    wait(0, exit_msg);
+    printf(exit_msg);
     break;
 
   case BACK:
@@ -165,13 +169,15 @@ main(void)
         fprintf(2, "cannot cd %s\n", buf+3);
       continue;
     }
-    if(fork1() == 0)
-      runcmd(parsecmd(buf));
 
-    // TASK 3
-    // char* exit_msg;
-    // wait(0, exit_msg);
-    // printf(exit_msg);
+    int pid = fork1();
+    if(pid == 0)
+      runcmd(parsecmd(buf));
+    else{
+      char msg[32];
+      wait(0, msg);
+      printf(msg);
+    }
 
   }
   exit(0, "");

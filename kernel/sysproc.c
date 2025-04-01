@@ -18,9 +18,12 @@ sys_exit(void)
   int n;
   argint(0, &n);
   //TASK 3
-  char* msg;
-  argstr(1, &msg, strlen(msg));
-  exit(n, "");
+  char msg[32];
+
+  argstr(1, msg, 32);
+
+  exit(n, msg);
+
   return 0;  // not reached
 }
 
@@ -39,9 +42,11 @@ sys_fork(void)
 uint64
 sys_wait(void)
 {
-  uint64 p;
-  argaddr(0, &p);
-  return wait(p);
+  uint64 p1;
+  uint64 msg;
+  argaddr(0, &p1);
+  argaddr(1, &msg);
+  return wait(p1, (char*) msg);
 }
 
 uint64

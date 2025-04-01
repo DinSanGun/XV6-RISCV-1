@@ -354,8 +354,11 @@ exit(int status, char* msg)
     panic("init exiting");
 
   // TASK 3
-  argstr(1 ,p->exit_msg , strlen(msg));
-
+  if (msg)
+    safestrcpy(p->exit_msg, msg, sizeof(p->exit_msg)); // Copy the string to the process PCB
+  else
+    p->exit_msg[0] = '\0'; // Clear the message if msg is NULL
+    
   // Close all open files.
   for(int fd = 0; fd < NOFILE; fd++){
     if(p->ofile[fd]){
@@ -392,8 +395,7 @@ exit(int status, char* msg)
 
 // Wait for a child process to exit and return its pid.
 // Return -1 if this process has no children.
-int
-wait(uint64 addr)
+int wait(uint64 addr, char* addr2)
 //TASK 3
 //wait(uint64 addr, uint64 msg_address)
 {
@@ -424,13 +426,7 @@ wait(uint64 addr)
           }
 
           // TASK 3
-          // if(msg_address != 0 && copyout(p->pagetable, msg_address, (char *)&pp->exit_msg,
-          //       sizeof(pp->exit_msg)) < 0)
-          //           {
-          //   release(&pp->lock);
-          //   release(&wait_lock);
-          //   return -1;
-          //   }
+          copyout(p->pagetable, (uint64) addr2, pp->exit_msg, 32);
 
           freeproc(pp);
           release(&pp->lock);
