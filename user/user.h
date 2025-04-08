@@ -7,6 +7,9 @@ int fork(void);
 int exit(int, char*) __attribute__((noreturn));
 //int wait(int*);
 // TASK 3
+// TASK 4
+int forkn(int, int*);
+int waitall(int* n, int* statuses);
 int wait(int*, char*);
 int pipe(int*);
 int write(int, const void*, int);

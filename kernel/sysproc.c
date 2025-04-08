@@ -40,6 +40,18 @@ sys_fork(void)
 }
 
 uint64
+sys_forkn(void)
+{
+  int n;
+  uint64 pids;
+
+  argint(0, &n);
+  argaddr(1, &pids);
+
+  return forkn(n, (int*) pids);
+}
+
+uint64
 sys_wait(void)
 {
   uint64 p1;
@@ -47,6 +59,18 @@ sys_wait(void)
   argaddr(0, &p1);
   argaddr(1, &msg);
   return wait(p1, (char*) msg);
+}
+
+uint64
+sys_waitall(void)
+{
+  uint64 n;
+  uint64 statuses;
+
+  argaddr(0, &n);
+  argaddr(1, &statuses);
+
+  return waitall((int*) n, (int*) statuses);
 }
 
 uint64

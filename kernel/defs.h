@@ -87,6 +87,7 @@ int             cpuid(void);
 // TASK 3
 void            exit(int, char*);
 int             fork(void);
+int             forkn(int, int*);
 int             growproc(int);
 void            proc_mapstacks(pagetable_t);
 pagetable_t     proc_pagetable(struct proc *);
@@ -103,6 +104,7 @@ void            sched(void);
 void            sleep(void*, struct spinlock*);
 void            userinit(void);
 int             wait(uint64, char*);
+int             waitall(int*, int*);
 // TASK 3
 //int             wait(uint64, char*);
 void            wakeup(void*);
