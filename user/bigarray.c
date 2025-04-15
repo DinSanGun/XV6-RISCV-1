@@ -56,10 +56,14 @@ int main(int argc, char *argv[]) {
       printf("Error: expected %d children to finish, but got %d\n", children_num, n_finished);
       exit(1, "Calculation failed");
     }
+
+    
     
     // Sum the results from all children
-    for (int i = 0; i < n_finished; i++)
+    for (int i = 0; i < n_finished; i++){
+      printf("Child %d sum: %d\n", i + 1, statuses[i]);
       total_sum += statuses[i];
+    }
     
     printf("Total sum is: %d\n", total_sum);
 
