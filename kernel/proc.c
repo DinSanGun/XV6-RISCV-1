@@ -326,21 +326,19 @@ fork(void)
 }
 
 // TASK 4
-
-
 int
 forkn(int n, int* pids)
 {
   int i;
   struct proc *np;
   struct proc *p = myproc();
-  struct proc *children[n];  // Track child procs, not just PIDs
+  struct proc *children[n];  // Track child procs
   
   // Validate input
   if(n < 1 || n > 16)
     return -1;
   
-  // Create n child processes, but keep them suspended
+  // Create n child processes but not making them RUNNABLE
   for(i = 0; i < n; i++){
     // Allocate process
     if((np = allocproc()) == 0){
@@ -359,7 +357,7 @@ forkn(int n, int* pids)
     // Copy saved user registers
     *(np->trapframe) = *(p->trapframe);
     
-    // Set return value for child (i+1)
+    // Set return value for child
     np->trapframe->a0 = i + 1;
     
     // Increment reference counts on open file descriptors
@@ -372,21 +370,17 @@ forkn(int n, int* pids)
     
     // Store PID in user space array
     int pid = np->pid;
-    printf("KERNEL PID: %d\n", pid);
-
     if(copyout(p->pagetable, (uint64)&pids[i], (char *)&pid, sizeof(pid)) < 0) {
       freeproc(np);
       release(&np->lock);
       goto cleanup;
     }
 
-
-    // Set parent relationship (with lock protection)
+    // Set parent relationship (wait_lock protected)
     acquire(&wait_lock);
     np->parent = p;
     release(&wait_lock);
     
-    // Keep np->lock held until we're sure all children created successfully
     release(&np->lock);
   }
   
@@ -397,17 +391,19 @@ forkn(int n, int* pids)
     release(&children[i]->lock);
   }
   
-  return 0;  // Success
+  // Success
+  return 0;  
   
 cleanup:
-  // Free any children we've already created (they're not running yet)
+  // Free any children we've already created
   for(int j = 0; j < i; j++){
     acquire(&children[j]->lock);
     freeproc(children[j]);
     release(&children[j]->lock);
   }
   
-  return -1;// Failure
+  // Failed
+  return -1;
 }
 
 // Pass p's abandoned children to init.
@@ -481,8 +477,6 @@ exit(int status, char* msg)
 // Wait for a child process to exit and return its pid.
 // Return -1 if this process has no children.
 int wait(uint64 addr, char* addr2)
-//TASK 3
-//wait(uint64 addr, uint64 msg_address)
 {
   struct proc *pp;
   int havekids, pid;
@@ -541,19 +535,14 @@ int waitall(int* n, int* statuses) {
   int child_count = 0;
   int exit_statuses[NPROC];
   
-  // Check input parameters
-  if(n == 0) {
-    return -1;  // Invalid pointer for n
-  }
-  
   acquire(&wait_lock);
   
   for(;;) {
     havekids = 0;
     stillrunning = 0;
-    child_count = 0;  // Reset count on each scan
+    child_count = 0;  // Reset count upon each iteration
     
-    // Scan through table looking for children
+    // Scan processes table for children
     for(pp = proc; pp < &proc[NPROC]; pp++){
       if(pp->parent == p){
         acquire(&pp->lock);
@@ -568,7 +557,7 @@ int waitall(int* n, int* statuses) {
           
           // Free the process
           freeproc(pp);
-        } else if(pp->state != UNUSED) {
+        } else {
           // Child is still running
           stillrunning = 1;
         }
@@ -577,24 +566,18 @@ int waitall(int* n, int* statuses) {
       }
     }
     
-    // No point waiting if we don't have any children or if the parent was killed
-    if(!havekids || killed(p)){
-      if(!havekids) {
-        // Set n to 0 if no children found
-        if(copyout(p->pagetable, (uint64)n, (char *)&child_count, sizeof(child_count)) < 0) {
-          release(&wait_lock);
-          return -1;
-        }
+    // Parent process does not have any children or was killed already
+    if(!havekids) {
+      // Set n to 0 if no children found
+      if(copyout(p->pagetable, (uint64)n, (char *)&child_count, sizeof(child_count)) < 0) {
         release(&wait_lock);
-        return 0;
+        return -1;
       }
-      
-      // Parent was killed
       release(&wait_lock);
-      return -1;
+      return 0;
     }
     
-    // All children are now zombies and have been processed
+    // All children are now zombies
     if(!stillrunning) {
       // Copy results to user space
       if(copyout(p->pagetable, (uint64)n, (char *)&child_count, sizeof(child_count)) < 0) {
