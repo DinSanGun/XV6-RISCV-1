@@ -557,7 +557,7 @@ int waitall(int* n, int* statuses) {
           
           // Free the process
           freeproc(pp);
-        } else {
+        } else if(pp->state != UNUSED) {
           // Child is still running
           stillrunning = 1;
         }
