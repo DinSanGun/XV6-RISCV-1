@@ -3,6 +3,32 @@
 #include "user/user.h"
 #include "kernel/param.h"
 
+// Convert integer to string
+void itoa(int n, char *buf) {
+  int i = 0, sign = 0;
+  if (n < 0) {
+    sign = 1;
+    n = -n;
+  }
+
+  // Convert digits to characters (reversed)
+  do {
+    buf[i++] = n % 10 + '0';
+  } while ((n /= 10) > 0);
+
+  if (sign)
+    buf[i++] = '-';
+
+  // Reverse the string
+  for (int j = 0; j < i / 2; j++) {
+    char tmp = buf[j];
+    buf[j] = buf[i - j - 1];
+    buf[i - j - 1] = tmp;
+  }
+
+  buf[i] = '\0'; // Null-terminate
+}
+
 int main(int argc, char *argv[]) {
 
   int arr_size = 1 << 16; // 2^16
@@ -56,14 +82,14 @@ int main(int argc, char *argv[]) {
       printf("Error: expected %d children to finish, but got %d\n", children_num, n_finished);
       exit(1, "Calculation failed");
     }
-
     
+    printf("Parent Print:\n");
     
     // Sum the results from all children
-    for (int i = 0; i < n_finished; i++){
+   for (int i = 0; i < n_finished; i++){
       printf("Child %d sum: %d\n", i + 1, statuses[i]);
       total_sum += statuses[i];
-    }
+    } 
     
     printf("Total sum is: %d\n", total_sum);
 
@@ -86,8 +112,10 @@ int main(int argc, char *argv[]) {
     for (int i = start_index; i < end_index; i++)
       partial_sum += num_array[i];
     
-  
-    //printf("Child process %d sum: %d\n",child_number, partial_sum);
+    // Printing partial sum
+    char buf[20];
+    itoa(partial_sum, buf);
+    write(1, buf, strlen(buf));
 
     // Exit with the local sum as the status
     exit(partial_sum, "");
@@ -97,3 +125,4 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
